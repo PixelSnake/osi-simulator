@@ -1,8 +1,15 @@
 module.exports = class Layer1 {
-    constructor(channel) {
+    constructor(channel, name) {
         //this.generatorPolynom = [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0]
         this.generatorPolynom = [1, 1, 0, 1, 0, 1]
         this.channel = channel
+        this.name = name
+    }
+
+    // connects to another networkadapter
+    connect(na) {
+        na.channel.connectDownstream(this.channel)
+        this.channel.connectDownstream(na.channel)
     }
 
     polynomDivision(dividend, divisor) {
@@ -59,8 +66,19 @@ module.exports = class Layer1 {
         let poly = this.generatorPolynom
         const n = poly.length - 1
 
-        const numBytes = _numBytes + n + 1
-        let data = this.channel.read(numBytes)
+        const numBytes = _numBytes + n
+        let data
+
+        try {
+            data = this.channel.read(numBytes)
+        } catch (e) {
+            return
+        }
+
+        if (data.length < 1) {
+            console.log(`[${this.name}] No data:`, data)
+            return
+        }
         //console.log('received data:', data.join(''))
 
         let rest = this.polynomDivision(data, poly)
@@ -75,7 +93,7 @@ module.exports = class Layer1 {
         }
 
         if (!valid) {
-          console.log('Data transmission failed')
+          console.log(`[${this.name}] Data transmission failed`)
           return
         }
 
@@ -88,5 +106,6 @@ module.exports = class Layer1 {
         }
 
         console.log(_message)
+        return _message
     }
 }

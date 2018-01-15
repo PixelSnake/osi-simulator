@@ -9,6 +9,6 @@ module.exports = class Channel {
     }
 
     getAmplitude() {
-        return this.amplitude + ((Math.random() - .5) * (1 - this.snr))
+        return this.amplitude + (Math.pow(Math.random() * 2, 4) * (1 - this.snr))
     }
 }

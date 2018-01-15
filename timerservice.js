@@ -1,6 +1,6 @@
 class TimerService {
     constructor() {
-        this.interval = 100
+        this.interval = 1
         this.tickRunning = false
         this.channels = []
 
